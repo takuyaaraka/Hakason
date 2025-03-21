@@ -1,0 +1,56 @@
+@startuml
+User->UnityApp : アイコンクリック
+UnityApp->UnityApp : 起動
+activate UnityApp
+UnityApp->User : ロゴマーク表示
+UnityApp->UnityApp : Resource Loading
+unityApp->User : メニューシーンを表示
+
+User->UnityApp : Shopを開くように命じる
+alt 失敗
+end
+UnityApp-->Server : アイテムの一覧\nよこせ
+
+alt 失敗
+Server -->UnityApp : 404　サーバーエラー
+UnityApp -> User : エラーでたよの表示
+unityApp -> UnityApp : 即時APP終了
+
+else 成功
+Server-->UnityApp : Array 配列で\n購入可能な\nアイテムの情報一覧　\n　productld \n name
+number \n cost \n ex
+Unity->Unity : UIを更新
+Unity->User : アイテムのリスト表示
+User->Unity : とあるItemを購入するボタン押下
+Unity->Shop : 購入可能なアイテム一覧を要求
+Shop-->Unity : 購入可能なアイテムの一覧　\prodactld
+Unity->Unity : ユーザーが購入しようとしている\nアイテムと数を割出
+Unity->Shop : とあるproductldのアイテムを/n,ユーザーが購入しようとしている
+Shop->Unity : 画面を裏に回して/n、課金のウィンドウだす
+Unity->User : ゲーム画面を裏に回す
+Unity->Shop : 画面が裏手に回った
+Shop->User : 課金のダイアログ　（ネイティブダイアログ）表示
+User->Shop : 購入処理、\n購入の意思表示
+Shop--> : 外部の課金処理が終結
+-->Shop : 課金成功
+
+Shop-->Unity : 課金最高情報　\n 購入したアイテムの情報　\n レシート(文字列)
+Unity->Server : ユーザー情報　\n レシート情報
+Server->Shop : レシートが正しいか問い合わせる
+Shop-->Server : おそらく正しい
+Server -> Server : DBに同じレシートがなかったか調べる
+Server --> Server : DBにこのユーザーのアカウントに対してアイテムを付属する
+Server --> Unity : そのアイテム付属していいよ
+Unity -> Unity : UIの更新　課金成功
+Unity -> User : UIを表示
+User -> Unity : SHOPのUIを閉じろ　\n　メニューシーンを移動しろ
+
+Unity -> User : SHOPを閉じて、\n メニューシーンに移動
+User->UnityApp : Endボタンを押した
+UnityApp->UnityApp: 終了シーケンス(Exit)
+UnityApp->User : ゲームを閉じて表示
+deactivate UnityApp
+
+end
+
+@enduml
